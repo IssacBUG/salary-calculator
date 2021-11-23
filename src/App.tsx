@@ -1,24 +1,31 @@
-import React from 'react';
-import logo from './logo.svg';
+import { Card, Col, Row } from 'antd';
+import React, { useState } from 'react';
 import './App.css';
+import Labelline from './components/SalaryChart';
+import SalaryForm from './components/SalaryForm';
+import SalaryReport from './components/SalaryReport';
+import { SalaryReportType } from './types';
 
 function App() {
+  const [salaryReport, setSalaryReport] = useState<SalaryReportType>({
+    months: [],
+  });
+
+  const changeSalaryReport = (data: SalaryReportType) => {
+    setSalaryReport(data);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div style={{ backgroundColor: '#F4F5F9' }}>
+      <Row>
+        <Col xs={24} md={{ span: 12, offset: 6 }}>
+          <Card title="工资计算器" style={{ textAlign: 'center' }}>
+            <SalaryForm changeSalaryReport={changeSalaryReport} />
+            <SalaryReport dataSource={salaryReport} />
+            <Labelline />
+          </Card>
+        </Col>
+      </Row>
     </div>
   );
 }
