@@ -1,8 +1,8 @@
 export interface MonthReportType {
   key: string;
-  month: number;
-  income: number;
-  monthTax: number;
+  month: string;
+  income: string;
+  monthTax: string;
 }
 
 export interface SalaryReportType {

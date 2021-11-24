@@ -8,15 +8,20 @@ import {
   Interaction,
   getTheme,
 } from 'bizcharts';
+import { SalaryChartType } from '../types';
 
-function Labelline() {
-  const data = [
-    { item: '事例一', count: 40, percent: 0.4 },
-    { item: '事例二', count: 21, percent: 0.21 },
-    { item: '事例三', count: 17, percent: 0.17 },
-    { item: '事例四', count: 13, percent: 0.13 },
-    { item: '事例五', count: 9, percent: 0.09 },
-  ];
+interface SalaryChartProps {
+  data: SalaryChartType[];
+}
+
+const SalaryChart: React.FC<SalaryChartProps> = ({ data = [] }) => {
+  // const data = [
+  //   { item: '事例一', count: 40, percent: 0.4 },
+  //   { item: '事例二', count: 21, percent: 0.21 },
+  //   { item: '事例三', count: 17, percent: 0.17 },
+  //   { item: '事例四', count: 13, percent: 0.13 },
+  //   { item: '事例五', count: 9, percent: 0.09 },
+  // ];
 
   const cols = {
     percent: {
@@ -62,7 +67,7 @@ function Labelline() {
           selected: {
             style: (t) => {
               const res = getTheme().geometries.interval.rect.selected.style(t);
-              return { ...res, fill: 'red' };
+              return { ...res };
             },
           },
         }}
@@ -70,6 +75,6 @@ function Labelline() {
       <Interaction type="element-single-selected" />
     </Chart>
   );
-}
+};
 
-export default Labelline;
+export default SalaryChart;

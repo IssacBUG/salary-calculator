@@ -23,8 +23,11 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "docker": "docker build -t salary-calculator .",
-    "docker:run": "docker run --rm -it -p 8080:80 salary-calculator"
+    "docker": "react-scripts build && docker build -t salary-calculator .",
+    "docker:run": "docker run --rm -it -p 8080:80 salary-calculator",
+    "docker:tag": "docker tag salary-calculator shadowyun/salary-calculator:0.2",
+    "docker:push": "docker push shadowyun/salary-calculator:0.2",
+    "docker:deploy": "docker run --rm -it -p 80:80 shadowyun/salary-calculator:0.2"
   },
   "eslintConfig": {
     "extends": [

@@ -36,7 +36,7 @@ export const personalTaxRate = [
   },
 ];
 
-export const personalInsuranceAndHousingOptions = [
+export const personalSocialInsuranceOptions = [
   { label: '养老保险金', value: 0.08 },
   { label: '医疗保险金', value: 0.02 },
   { label: '失业保险金', value: 0.005 },
@@ -44,7 +44,7 @@ export const personalInsuranceAndHousingOptions = [
   { label: '补充住房公积金', value: 0 },
 ];
 
-export const companyInsuranceAndHousingOptions = [
+export const companySocialInsuranceOptions = [
   { label: '养老保险金', value: 0.08 },
   { label: '医疗保险金', value: 0.02 },
   { label: '失业保险金', value: 0.005 },

@@ -1,4 +1,4 @@
-import { Col, Row, Table } from 'antd';
+import { Table } from 'antd';
 import { SalaryReportType } from '../types';
 
 interface SalaryReportProps {
@@ -20,7 +20,7 @@ const SalaryReport: React.FC<SalaryReportProps> = ({ dataSource = {} }) => {
 
   return (
     <>
-      <Table dataSource={months} columns={columns}></Table>
+      <Table dataSource={months} columns={columns} pagination={false}></Table>
     </>
   );
 };
