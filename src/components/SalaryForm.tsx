@@ -1,19 +1,17 @@
-import { min } from '@antv/util';
-import { Button, Col, Collapse, Form, Input, Radio, Row, Select } from 'antd';
-import { useState } from 'react';
+import { min } from "@antv/util";
+import { Button, Col, Collapse, Form, Input, Radio, Row, Select } from "antd";
+import { useState } from "react";
 import {
   cities,
   continuingDeductionOptions,
   educationDeductionOptions,
   houseDeductionOptions,
-  personalSocialInsuranceOptions,
-  personalTaxRate,
   supportDeductionOptions,
   tenancyDeductionOptions,
-} from '../data';
-import { MonthReportType, SalaryChartType, SalaryReportType } from '../types';
+} from "../data";
+import { SalaryChartType, SalaryReportType } from "../types";
 
-import { getPersonalTax, getTaxLevel, range } from '../utils';
+import { getPersonalChartData, getPersonalTax, range } from "../utils";
 
 const cityMap = new Map();
 
@@ -23,7 +21,7 @@ cities.forEach((value, index) => {
 
 interface SalaryFormProps {
   changeSalaryReport: (data: SalaryReportType) => void;
-  changeSalaryChart?: (data: SalaryChartType[]) => void;
+  changeSalaryChart: (data: SalaryChartType[]) => void;
 }
 
 const SalaryForm: React.FC<SalaryFormProps> = ({
@@ -52,21 +50,21 @@ const SalaryForm: React.FC<SalaryFormProps> = ({
 
   const onInsuranceChange = (e: any) => {
     const value = e.target.value;
-    if (typeof value === 'boolean') {
+    if (typeof value === "boolean") {
       setIncludeInsurance(value);
     }
   };
 
   const onHousingChange = (e: any) => {
     const value = e.target.value;
-    if (typeof value === 'boolean') {
+    if (typeof value === "boolean") {
       setIncludeHousing(value);
     }
   };
 
   const onSpecialDeductionChange = (e: any) => {
     const value = e.target.value;
-    if (typeof value === 'boolean') {
+    if (typeof value === "boolean") {
       setIncludeSpecialDeduction(value);
     }
   };
@@ -76,17 +74,17 @@ const SalaryForm: React.FC<SalaryFormProps> = ({
   };
 
   const onFinish = () => {
-    let base = parseFloat(form.getFieldValue('base')),
-      allowance = parseFloat(form.getFieldValue('allowance')),
-      yearend = parseFloat(form.getFieldValue('yearend')),
-      housingRate = parseFloat(form.getFieldValue('housingRate')) / 100,
+    let base = parseFloat(form.getFieldValue("base")),
+      allowance = parseFloat(form.getFieldValue("allowance")),
+      yearend = parseFloat(form.getFieldValue("yearend")),
+      housingRate = parseFloat(form.getFieldValue("housingRate")) / 100,
       insuranceBase = base,
       housingBase = base;
 
-    const minInsuranceBase = parseFloat(form.getFieldValue('minInsuranceBase')),
-      maxInsuranceBase = parseFloat(form.getFieldValue('maxInsuranceBase')),
-      minHousingBase = parseFloat(form.getFieldValue('minHousingBase')),
-      maxHousingBase = parseFloat(form.getFieldValue('maxHousingBase'));
+    const minInsuranceBase = parseFloat(form.getFieldValue("minInsuranceBase")),
+      maxInsuranceBase = parseFloat(form.getFieldValue("maxInsuranceBase")),
+      minHousingBase = parseFloat(form.getFieldValue("minHousingBase")),
+      maxHousingBase = parseFloat(form.getFieldValue("maxHousingBase"));
 
     if (base < minInsuranceBase) {
       insuranceBase = minInsuranceBase;
@@ -101,11 +99,11 @@ const SalaryForm: React.FC<SalaryFormProps> = ({
     }
 
     const deductTaxOptions: Record<string, number> = form.getFieldsValue([
-      'educationDeduction',
-      'continuingDeduction',
-      'supportDeduction',
-      'houseDeduction',
-      'tenancyDeduction',
+      "educationDeduction",
+      "continuingDeduction",
+      "supportDeduction",
+      "houseDeduction",
+      "tenancyDeduction",
     ]);
 
     const deductTax = Object.keys(deductTaxOptions).reduce((pre, cur) => {
@@ -122,35 +120,25 @@ const SalaryForm: React.FC<SalaryFormProps> = ({
       allowance,
       yearend,
       insurance + housing,
-      deductTax,
+      deductTax
     );
 
     changeSalaryReport(salaryReport);
+    const lastIndex = salaryReport.months.length - 1;
 
-    const salaryChart: SalaryChartType[] = [];
-
-    const personalSalaryChart = [];
-
-    personalSocialInsuranceOptions.forEach((value, index) => {
-      let percent = 0;
-      switch (value.label) {
-        case '基本住房公积金':
-          percent = form.getFieldValue('housing');
-          break;
-        case '补充住房公积金':
-          percent = form.getFieldValue('');
-          break;
-        default:
-          break;
-      }
-      const item: SalaryChartType = {
-        item: value.label,
-        count: (base * percent) / (base + allowance),
-        percent: percent === 0 ? value.value : percent,
-      };
-      console.log('salaryChart', item);
-      personalSalaryChart.push(item);
-    });
+    const { income: totalIncome, monthTax: totalTax } =
+      salaryReport.months[lastIndex];
+    console.log("totalTax");
+    const salaryChart: SalaryChartType[] = getPersonalChartData(
+      base,
+      parseFloat(totalIncome),
+      parseFloat(totalTax),
+      housingRate,
+      0,
+      includeInsurance,
+      includeHousing
+    );
+    changeSalaryChart(salaryChart);
   };
 
   const onReset = () => {
@@ -168,7 +156,7 @@ const SalaryForm: React.FC<SalaryFormProps> = ({
         wrapperCol={{ span: 12 }}
       >
         <Form.Item label="选择城市" name="region" rules={[{ required: false }]}>
-          <Select defaultValue={'北京'} onChange={onRegionChange}>
+          <Select defaultValue={"北京"} onChange={onRegionChange}>
             {cities.map((value: any) => (
               <Select.Option value={value.value}>{value.label}</Select.Option>
             ))}
@@ -178,7 +166,7 @@ const SalaryForm: React.FC<SalaryFormProps> = ({
           label="税前基本工资"
           name="base"
           initialValue={5000}
-          rules={[{ required: true, message: '' }]}
+          rules={[{ required: true, message: "" }]}
         >
           <Input />
         </Form.Item>
@@ -206,23 +194,23 @@ const SalaryForm: React.FC<SalaryFormProps> = ({
         </Form.Item>
         {includeInsurance ? (
           <Form.Item label="社保缴纳基数">
-            <Input.Group compact style={{ width: '100%' }}>
+            <Input.Group compact style={{ width: "100%" }}>
               <Form.Item
                 name="minInsuranceBase"
                 initialValue={cities[cityIndex].insuranceRange[0]}
                 style={{
-                  display: 'inline-block',
-                  width: 'calc(50% - 12px)',
+                  display: "inline-block",
+                  width: "calc(50% - 12px)",
                 }}
               >
                 <Input placeholder="下限" />
               </Form.Item>
               <span
                 style={{
-                  display: 'inline-block',
-                  width: '24px',
-                  lineHeight: '32px',
-                  textAlign: 'center',
+                  display: "inline-block",
+                  width: "24px",
+                  lineHeight: "32px",
+                  textAlign: "center",
                 }}
               >
                 -
@@ -231,8 +219,8 @@ const SalaryForm: React.FC<SalaryFormProps> = ({
                 name="maxInsuranceBase"
                 initialValue={cities[cityIndex].insuranceRange[1]}
                 style={{
-                  display: 'inline-block',
-                  width: 'calc(50% - 12px)',
+                  display: "inline-block",
+                  width: "calc(50% - 12px)",
                 }}
               >
                 <Input placeholder="上限" />
@@ -259,23 +247,23 @@ const SalaryForm: React.FC<SalaryFormProps> = ({
         {includeHousing ? (
           <>
             <Form.Item label="公积金缴纳基数">
-              <Input.Group compact style={{ width: '100%' }}>
+              <Input.Group compact style={{ width: "100%" }}>
                 <Form.Item
                   name="minHousingBase"
                   initialValue={cities[cityIndex].housingRange[0]}
                   style={{
-                    display: 'inline-block',
-                    width: 'calc(50% - 12px)',
+                    display: "inline-block",
+                    width: "calc(50% - 12px)",
                   }}
                 >
                   <Input placeholder="下限" />
                 </Form.Item>
                 <span
                   style={{
-                    display: 'inline-block',
-                    width: '24px',
-                    lineHeight: '32px',
-                    textAlign: 'center',
+                    display: "inline-block",
+                    width: "24px",
+                    lineHeight: "32px",
+                    textAlign: "center",
                   }}
                 >
                   -
@@ -284,8 +272,8 @@ const SalaryForm: React.FC<SalaryFormProps> = ({
                   name="maxHousingBase"
                   initialValue={cities[cityIndex].housingRange[1]}
                   style={{
-                    display: 'inline-block',
-                    width: 'calc(50% - 12px)',
+                    display: "inline-block",
+                    width: "calc(50% - 12px)",
                   }}
                 >
                   <Input placeholder="上限" />
@@ -299,7 +287,7 @@ const SalaryForm: React.FC<SalaryFormProps> = ({
             >
               <Select>
                 {range(5, 12).map((value, index) => (
-                  <Select.Option key={'housingRate' + index} value={value}>
+                  <Select.Option key={"housingRate" + index} value={value}>
                     {value}
                   </Select.Option>
                 ))}
@@ -333,7 +321,7 @@ const SalaryForm: React.FC<SalaryFormProps> = ({
               <Select>
                 {educationDeductionOptions.map((value, index) => (
                   <Select.Option
-                    key={'educationDeduction' + index}
+                    key={"educationDeduction" + index}
                     value={value.value}
                   >
                     {value.label}
@@ -349,7 +337,7 @@ const SalaryForm: React.FC<SalaryFormProps> = ({
               <Select>
                 {continuingDeductionOptions.map((value, index) => (
                   <Select.Option
-                    key={'continuingDeduction' + index}
+                    key={"continuingDeduction" + index}
                     value={value.value}
                   >
                     {value.label}
@@ -376,7 +364,7 @@ const SalaryForm: React.FC<SalaryFormProps> = ({
                 <Select>
                   {supportDeductionOptions.map((value, index) => (
                     <Select.Option
-                      key={'supportDeduction' + index}
+                      key={"supportDeduction" + index}
                       value={value.value}
                     >
                       {value.label}
@@ -395,7 +383,7 @@ const SalaryForm: React.FC<SalaryFormProps> = ({
               <Select>
                 {houseDeductionOptions.map((value, index) => (
                   <Select.Option
-                    key={'houseDeduction' + index}
+                    key={"houseDeduction" + index}
                     value={value.value}
                   >
                     {value.label}
@@ -411,7 +399,7 @@ const SalaryForm: React.FC<SalaryFormProps> = ({
               <Select>
                 {tenancyDeductionOptions.map((value, index) => (
                   <Select.Option
-                    key={'tenancyDeduction' + index}
+                    key={"tenancyDeduction" + index}
                     value={value.value}
                   >
                     {value.label}

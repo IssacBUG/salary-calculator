@@ -1,5 +1,6 @@
-import { personalTaxRate } from '../data';
-import { MonthReportType, SalaryReportType } from '../types';
+import { type } from "os";
+import { personalTaxRate } from "../data";
+import { MonthReportType, SalaryChartType, SalaryReportType } from "../types";
 
 export function range(start: number, end: number) {
   return new Array(end - start + 1)
@@ -23,7 +24,7 @@ export function getPersonalTax(
   allowance: number,
   yearend: number,
   socailInsurance: number,
-  deductTex: number,
+  deductTex: number
 ) {
   let totalTax = 0,
     totalIncome = 0;
@@ -64,7 +65,7 @@ export function getPersonalTax(
   }
   const totalReport: MonthReportType = {
     key: `reportItem-${13}`,
-    month: '总计',
+    month: "总计",
     income: totalIncome.toFixed(2),
     monthTax: totalTax.toFixed(2),
   };
@@ -74,10 +75,66 @@ export function getPersonalTax(
 }
 
 export function getPersonalChartData(
+  base: number,
   totalIncome: number,
-  insurance: number,
-  housing: number,
   totalTax: number,
-) {}
+  housingRate: number,
+  supplyHousingRate: number,
+  inclueInsurance: boolean,
+  inclueHousing: boolean
+) {
+  const total = totalIncome + totalTax;
+  const chartData: SalaryChartType[] = [
+    {
+      item: "税后薪资",
+      count: totalIncome,
+      percent: numberFixed2(totalIncome / total),
+    },
+  ];
+  if (typeof supplyHousingRate === "number" && supplyHousingRate !== 0) {
+    chartData.push({
+      item: "补充住房公积金",
+      count: base * supplyHousingRate ? supplyHousingRate : 0 * 12,
+      percent: numberFixed2((base * 0.005 * 12) / total),
+    });
+  }
+  if (totalTax > 0) {
+    chartData.push({
+      item: "个人所得税",
+      count: totalTax,
+      percent: numberFixed2(totalTax / total),
+    });
+  }
+  if (inclueHousing) {
+    chartData.push({
+      item: "基本住房公积金",
+      count: base * housingRate * 12,
+      percent: numberFixed2((base * housingRate * 12) / total),
+    });
+  }
+  if (inclueInsurance) {
+    chartData.push(
+      {
+        item: "养老保险金",
+        count: base * 0.08 * 12,
+        percent: numberFixed2((base * 0.08 * 12) / total),
+      },
+      {
+        item: "医疗保险金",
+        count: base * 0.02 * 12,
+        percent: numberFixed2((base * 0.02 * 12) / total),
+      },
+      {
+        item: "失业保险金",
+        count: base * 0.005 * 12,
+        percent: numberFixed2((base * 0.005 * 12) / total),
+      }
+    );
+  }
+  return chartData;
+}
+export function numberFixed2(num: number) {
+  return Math.floor(num * 100) / 100;
+}
 
 export function getCorporateTax() {}

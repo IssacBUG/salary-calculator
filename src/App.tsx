@@ -1,11 +1,11 @@
-import { Card, Col, Row } from 'antd';
-import React, { useState } from 'react';
-import './App.css';
-import SalaryChart from './components/SalaryChart';
+import { Card, Col, Row } from "antd";
+import React, { useState } from "react";
+import "./App.css";
+import SalaryChart from "./components/SalaryChart";
 
-import SalaryForm from './components/SalaryForm';
-import SalaryReport from './components/SalaryReport';
-import { SalaryChartType, SalaryReportType } from './types';
+import SalaryForm from "./components/SalaryForm";
+import SalaryReport from "./components/SalaryReport";
+import { SalaryChartType, SalaryReportType } from "./types";
 
 function App() {
   const [salaryReport, setSalaryReport] = useState<SalaryReportType>({
@@ -23,18 +23,20 @@ function App() {
   };
 
   return (
-    <div style={{ backgroundColor: '#F4F5F9' }}>
+    <div style={{ backgroundColor: "#F4F5F9" }}>
       <Row>
         <Col xs={24} md={{ span: 12, offset: 6 }}>
-          <Card title="工资计算器" style={{ textAlign: 'center' }}>
+          <Card title="工资计算器" style={{ textAlign: "center" }}>
             <SalaryForm
               changeSalaryReport={changeSalaryReport}
               changeSalaryChart={changeSalaryChart}
             />
-            <div style={{ marginTop: '36px' }}>
+            <div style={{ marginTop: "36px" }}>
               <SalaryReport dataSource={salaryReport} />
             </div>
-            <SalaryChart data={salaryChart} />
+            <div style={{ marginTop: "36px" }}>
+              <SalaryChart data={salaryChart} />
+            </div>
           </Card>
         </Col>
       </Row>
